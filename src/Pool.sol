@@ -6,12 +6,6 @@ import "./interfaces/IPool.sol";
 
 contract Pool is IPool {
 
-    struct User {
-        uint256 tokenAmount; // total tokens in the pool
-        Deposit[] deposits;  // deposits = [{tokenAmount, timestamp}, ...]
-    }
-    mapping(address => User) public users;
-
     /**
     users = [
         user1Address = {
@@ -21,11 +15,22 @@ contract Pool is IPool {
                 {tokenAmount: 20, timestamp: 200},
                 {tokenAmount: 30, timestamp: 300},
             ]
-        },
+        }, 
+        user2Address = {...}, 
+        ...
     ]
     */
+    struct User {
+        // @dev Total tokens in the pool
+        uint256 tokenAmount; 
+        // @dev deposits = [{tokenAmount, timestamp}, {...}, ...]
+        Deposit[] deposits;  
+    }
+   
+    mapping(address => User) public users;
 
-    constructor() {}
+
+    constructor(address _poolToken) {}
 
     function getDeposit(address _user, uint256 _depositId) public view returns (Deposit memory) {
         require(_depositId != 0x0);
@@ -45,6 +50,17 @@ contract Pool is IPool {
         }
 
         return (tokenAmounts, timestamps);
+    }
+
+    function getTotalStakedPerUser(address _user) public view returns (uint256) {
+        User memory user = users[_user];
+        uint256 total = 0;
+
+        for (uint i = 0; i < user.deposits.length; i++) {
+            total += user.deposits[i].tokenAmount;
+        }
+
+        return total;
     }
 
     // @dev Unstake tokens from the pool
