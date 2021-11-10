@@ -8,6 +8,7 @@ import "../utils/Ownable.sol";
 contract PoolFactory is Ownable, IPool {
     address owner;
     uint256 baseMod = 100;
+    address avaxToken = FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z;
 
     struct PoolData {
         address poolToken;
@@ -21,8 +22,14 @@ contract PoolFactory is Ownable, IPool {
         uint256 feeDistribution;
         uint256 totalStaked;
     }
-    mapping (bytes32 => mapping (address => PoolData)) internal poolNameToAddresses;
+    mapping (address => PoolData) internal poolAddressToData;
     mapping (address => address) public pools;
+
+    event PoolRegistered(
+        address indexed _by,
+        address indexed poolToken,
+        address indexed poolAddress
+    );
 
     constructor() {
         owner = msg.sender; // is this exploitable?
@@ -51,20 +58,18 @@ contract PoolFactory is Ownable, IPool {
         });
     }
 
-    function createStakingPool(uint256 _incentiveSupply, bytes32[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, bytes32 _poolName) onlyOwner external virtual returns (bool) {
-        poolName = _poolName;
-        new Pool(poolName, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
-        // how do we get the deployed address?
+    function createStakingPool(uint256 _incentiveSupply, bytes32[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, bytes32 _poolName, address _poolToken) onlyOwner external virtual returns (bool) {
+
+        IPool pool = new Pool(_poolName, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
+        
+
         poolNameToAddresses[_poolName] = {
-            poolToken: poolToken,
-            poolAddress: poolAddress,
+            poolToken: _poolToken,
             incentivesSupply: _incentiveSupply,
-            incentivesRemaining: _incentiveSupply, // how do we calculate incestives remaining?
+            incentivesRemaining: _incentiveSupply,
             incentiveLevels: _incentiveLevels,
             depositFee: _depositFee,
             withdrawalFee: _withdrawalFee,
+        };
     }
-
-    return 
-
 }
