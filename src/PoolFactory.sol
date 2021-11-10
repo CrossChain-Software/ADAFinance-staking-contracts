@@ -39,6 +39,10 @@ contract PoolFactory is Ownable, IPool {
         return pools[_poolToken];
     }
 
+    function getTotalStaked(address _poolAddress) public view returns (uint256) {
+        return poolAddressToData[_poolAddress].totalStaked;
+    }
+
     function getStakingPoolInfo(bytes32 _poolName, address _poolToken) public view returns (address) {
         address poolAddress = pools[_pooToken];
         require(poolAddress != address(0), "pool not found!");
