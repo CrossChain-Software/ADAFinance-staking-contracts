@@ -12,8 +12,10 @@ interface IPool {
     }
 
     function getDeposit(address _user, uint256 _depositId) external view returns (Deposit memory);
+
+    function getDeposits(address _user) external view returns (uint256[] memory, uint256[] memory);
     
-    function getIncentivesSupply() external view returns (uint256);
+    // function getIncentivesSupply() external view returns (uint256);
     
     // function getIncentivesRemaining() external view returns (uint256);
     
