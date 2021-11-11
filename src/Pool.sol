@@ -2,9 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/IPool.sol";
+import "./utils/Ownable.sol";
 
 
-contract Pool is IPool {
+contract Pool is IPool, Ownable {
 
     struct User {
         /// @dev Total tokens in the pool
@@ -16,21 +17,27 @@ contract Pool is IPool {
     mapping(address => User) public users;
     address poolToken;
     uint256 incentiveSupply;
-    uint256[] incentiveLevels;
+    uint256 level1Rewards;
+    uint256 level2Rewards;
     uint256 depositFee;
     uint256 withdrawalFee;
     uint256 minAmount;
-    uint256[] feeDistribution;
+    uint256 daoDistribution;
+    address daoAddress; 
+    uint256 affiliateDistribution; 
+    address affiliateAddress;
 
 
-    constructor(address _poolToken, uint256 _incentiveSupply, uint256[]  memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution) {
+    constructor(address _poolToken, uint256 _incentiveSupply, uint256 _level1Rewards, uint256 _level2Rewards, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256 _daoDistribution, uint256 _affiliateDistribution) {
         poolToken = _poolToken;
         incentiveSupply = _incentiveSupply;
-        incentiveLevels = _incentiveLevels;
+        level1Rewards = _level1Rewards;
+        level2Rewards = _level2Rewards;
         depositFee = _depositFee;
         withdrawalFee = _withdrawalFee;
         minAmount = _minAmount;
-        feeDistribution = _feeDistribution;
+        daoDistribution = _daoDistribution;
+        affiliateDistribution = _affiliateDistribution;
     }
 
     function getPoolToken() public view returns (address) {
@@ -75,5 +82,18 @@ contract Pool is IPool {
         users[_user].tokenAmount -= _amount;
         // need to transfer funds to user
     }
+
+
+    function updateFeeDistributions(uint256 daoDistribution, address daoAddress, uint256 affiliateDistribution, address affiliateAddress) public onlyOwner {
+        require(daoDistribution + affiliateDistribution <= 100);
+
+    }
     
+    function updateFeeDistrbutionAddresses(address _daoAddress, address _affiliateAddress) public onlyOwner {
+        require(msg.sender == owner());
+        require(_daoAddress != address(0x0));
+        require(_affiliateAddress != address(0x0));
+        daoAddress = _daoAddress;
+        affiliateAddress = _affiliateAddress;
+    }
 }

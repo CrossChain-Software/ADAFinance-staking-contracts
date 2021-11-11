@@ -11,14 +11,6 @@ contract PoolFactoryTest is DSTest {
         poolFactory = new PoolFactory();
     }
 
-    function testFailsIfNotMult2() public {
-        uint result = poolFactory.dappTest(4);
-        uint testGas = result * 2;
-        emit log("ahh im test logginggggggg");
-        emit log_uint(testGas);
-        assertEq(testGas, 8);
-    }
-
     function testCreateStakingPool() public {
         emit log("ahh im test logginggggggg");
         // baseMod = 100

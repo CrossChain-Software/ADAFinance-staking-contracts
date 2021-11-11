@@ -7,19 +7,27 @@ import "./utils/Ownable.sol";
 
 contract PoolFactory is Ownable {
     address internal avaxTokenAddress = 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7;
+    uint16 baseMod = 1000;
+    uint256 daoDistribution = 20 / baseMod;
+    address daoAddress; 
+    uint256 affiliateDistribution = 30 / baseMod; 
+    address affiliateAddress;
 
     struct PoolData {
         address poolToken;
         address poolAddress;
         uint256 incentivesSupply;
         uint256 incentivesRemaining;
-        uint256 incentiveLevels;
+        uint256 level1Rewards;
+        uint256 level2Rewards;
         uint256 depositFee;
         uint256 withdrawalFee;
         uint256 minAmount;
-        uint256 feeDistribution;
+        uint256 daoDistribution;
+        uint256 affiliateDistribution;
         uint256 totalStaked;
     }
+
     /// @dev poolAddress => PoolData
     mapping (address => PoolData) internal pools;
     
@@ -50,22 +58,26 @@ contract PoolFactory is Ownable {
 
         return PoolData({
             poolToken: pools[_poolAddress].poolToken,
-            poolAddress: pools[_poolAddress].poolAddress,
+            poolAddress: pools[_poolAddress].poolAddress, // we can drop this and use it as the key in a mapping- mapping (poolAddress => PoolData)
             incentivesSupply: pools[_poolAddress].incentivesSupply,
             incentivesRemaining: pools[_poolAddress].incentivesRemaining,
-            incentiveLevels: pools[_poolAddress].incentiveLevels,
+            level1Rewards: pools[_poolAddress].level1Rewards,
+            level2Rewards: pools[_poolAddress].level2Rewards,
             depositFee: pools[_poolAddress].depositFee,
             withdrawalFee: pools[_poolAddress].withdrawalFee,
             minAmount: pools[_poolAddress].minAmount,
-            feeDistribution: pools[_poolAddress].feeDistribution,
+            daoDistribution: pools[_poolAddress].daoDistribution,
+            affiliateDistribution: pools[_poolAddress].affiliateDistribution,
             totalStaked: pools[_poolAddress].totalStaked
         });
     }
 
-    function createStakingPool(uint256 _incentiveSupply, uint256[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, address _poolToken) onlyOwner external virtual {
+    function createStakingPool(address _poolToken, uint256 _incentiveSupply, uint256 _level1Rewards, uint256 _level2Rewards, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256 _daoDistribution, uint256 _affiliateDistribution) onlyOwner external virtual {
 
-        IPool pool = new Pool(_poolToken, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
+        IPool pool = new Pool(_poolToken, _incentiveSupply, _level1Rewards, _level2Rewards, _depositFee, _withdrawalFee, _minAmount, daoDistribution, affiliateDistribution);
         
         // registerPool(address(pool));
+
+        emit PoolRegistered(msg.sender, _poolToken, address(pool));
     }
 }
