@@ -6,7 +6,9 @@ import "./Pool.sol";
 import "./utils/Ownable.sol";
 
 contract PoolFactory is Ownable {
-    address internal avaxTokenAddress = 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7;
+    address internal constant avaxTokenAddress = 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7;
+    address public immutable adafiTokenAddress;
+    
     uint16 baseMod = 1000;
     uint256 daoDistribution = 20 / baseMod;
     address daoAddress; 
@@ -40,7 +42,9 @@ contract PoolFactory is Ownable {
         address indexed poolAddress
     );
 
-    constructor() {
+    constructor(address _adafiTokenAddress) {
+        require(_adafiTokenAddress != address(0));
+        adafiTokenAddress = _adafiTokenAddress;
     }
 
     function getPoolAddress (address _poolToken) public view returns (address) {
