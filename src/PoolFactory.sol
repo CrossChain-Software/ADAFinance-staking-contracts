@@ -21,11 +21,11 @@ contract PoolFactory is Ownable {
         uint256 feeDistribution;
         uint256 totalStaked;
     }
-    // this has to change, we need the tokenAddress => PoolData
-    // or should it be poolAddress => PoolData?
+    /// @dev poolAddress => PoolData
     mapping (address => PoolData) internal pools;
-    // tokenAddress => poolAdddress => PoolData
-    mapping (address => mapping(address => PoolData)) pools2;
+    
+    /// @dev tokenAddress => poolAdddress => PoolData
+    mapping (address => mapping(address => PoolData)) poolsByToken;
 
     event PoolRegistered(
         address indexed _by,

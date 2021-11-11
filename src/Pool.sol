@@ -6,24 +6,10 @@ import "./interfaces/IPool.sol";
 
 contract Pool is IPool {
 
-    /**
-    users = [
-        user1Address = {
-            tokenAmount: 100,
-            deposits: [
-                {tokenAmount: 10, timestamp: 100},
-                {tokenAmount: 20, timestamp: 200},
-                {tokenAmount: 30, timestamp: 300},
-            ]
-        }, 
-        user2Address = {...}, 
-        ...
-    ]
-    */
     struct User {
-        // @dev Total tokens in the pool
+        /// @dev Total tokens in the pool
         uint256 tokenAmount; 
-        // @dev deposits = [{tokenAmount, timestamp}, {...}, ...]
+        /// @dev deposits = [{tokenAmount, timestamp}, {...}, ...]
         Deposit[] deposits;  
     }
    
@@ -83,7 +69,6 @@ contract Pool is IPool {
     }
 
     
-
     // @dev Unstake tokens from the pool
     function unstake(address _user, uint256 _amount) public { 
         require(users[_user].tokenAmount >= _amount);
