@@ -38,7 +38,7 @@ contract PoolFactory is Ownable {
     }
 
     function getPoolAddress (address _poolToken) public view returns (address) {
-        return pools[_poolToken];
+        return pools[_poolToken].poolAddress;
     }
 
     function getTotalStaked(address _poolAddress) public view returns (uint256) {
@@ -46,8 +46,8 @@ contract PoolFactory is Ownable {
     }
 
     // need to test- never returned a data type like this before
-    function getStakingPoolInfo(address _poolAddress) public view returns (address) {
-        require(_poolAddress != address(0), "Pool not found!");];
+    function getStakingPoolInfo(address _poolAddress) public view returns (PoolData memory) {
+        require(_poolAddress != address(0), "Pool not found!");
 
 
         return PoolData({
@@ -64,12 +64,17 @@ contract PoolFactory is Ownable {
         });
     }
 
-    function createStakingPool(uint256 _incentiveSupply, bytes32[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, bytes32 _poolName, address _poolToken) onlyOwner external virtual returns (bool) {
+    function createStakingPool(uint256 _incentiveSupply, uint256[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, bytes32 _poolName, address _poolToken) onlyOwner external virtual returns (address) {
 
         IPool pool = new Pool(_poolToken, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
         
         // how do we create a new contract address and add it to the PoolData state + mapping?
 
         return pool; // i think this returns the contract address?
+    }
+
+    function dappTest(uint256 num) public view returns (uint256) {
+        uint256 mult = num * 2;
+        return mult;
     }
 }
