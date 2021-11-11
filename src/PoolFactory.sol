@@ -66,13 +66,6 @@ contract PoolFactory is Ownable {
 
         IPool pool = new Pool(_poolToken, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
         
-        // how do we create a new contract address and add it to the PoolData state + mapping?
-
-        // return pool; // i think this returns the contract address?
-    }
-
-    function dappTest(uint256 num) public payable returns (uint256) {
-        uint256 mult = num * 2;
-        return mult;
+        // registerPool(address(pool));
     }
 }
