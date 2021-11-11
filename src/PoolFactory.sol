@@ -6,7 +6,6 @@ import "./Pool.sol";
 import "./utils/Ownable.sol";
 
 contract PoolFactory is Ownable {
-    address internal owner;
     address internal avaxTokenAddress = 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7;
 
     struct PoolData {
@@ -34,7 +33,6 @@ contract PoolFactory is Ownable {
     );
 
     constructor() {
-        owner = msg.sender;
     }
 
     function getPoolAddress (address _poolToken) public view returns (address) {
@@ -64,16 +62,16 @@ contract PoolFactory is Ownable {
         });
     }
 
-    function createStakingPool(uint256 _incentiveSupply, uint256[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, bytes32 _poolName, address _poolToken) onlyOwner external virtual returns (address) {
+    function createStakingPool(uint256 _incentiveSupply, uint256[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, address _poolToken) onlyOwner external virtual {
 
         IPool pool = new Pool(_poolToken, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
         
         // how do we create a new contract address and add it to the PoolData state + mapping?
 
-        return pool; // i think this returns the contract address?
+        // return pool; // i think this returns the contract address?
     }
 
-    function dappTest(uint256 num) public view returns (uint256) {
+    function dappTest(uint256 num) public payable returns (uint256) {
         uint256 mult = num * 2;
         return mult;
     }

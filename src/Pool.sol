@@ -37,13 +37,13 @@ contract Pool is IPool {
         return poolToken;
     }
 
-    function getDeposit(address _user, uint256 _depositId) public view returns (Deposit memory) {
+    function getDeposit(address _user, uint256 _depositId) public view override returns (Deposit memory) {
         require(_depositId != 0x0);
         User memory user = users[_user];
         return user.deposits[_depositId];
     }
 
-    function getDeposits(address _user) public view returns (uint256[] memory, uint256[] memory) {
+    function getDeposits(address _user) public view override returns (uint256[] memory, uint256[] memory) {
         User memory user = users[_user];
 
         /// @dev user[userAddress].deposits -> convert to tuple to return, cant return structs
@@ -57,7 +57,7 @@ contract Pool is IPool {
         return (tokenAmounts, timestamps);
     }
 
-    function getTotalStakedPerUser(address _user) public view returns (uint256) {
+    function getTotalStakedPerUser(address _user) public view override returns (uint256) {
         User memory user = users[_user];
         uint256 total = 0;
 
