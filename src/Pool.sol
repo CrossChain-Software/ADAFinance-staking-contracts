@@ -28,9 +28,24 @@ contract Pool is IPool {
     }
    
     mapping(address => User) public users;
+    address poolToken;
+    uint256 incentiveSupply;
+    uint256[] incentiveLevels;
+    uint256 depositFee;
+    uint256 withdrawalFee;
+    uint256 minAmount;
+    uint256[] feeDistribution;
 
 
-    constructor(address _poolToken) {}
+    constructor(address _poolToken, uint256 _incentiveSupply, uint256[]  memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution) {
+        poolToken = _poolToken;
+        incentiveSupply = _incentiveSupply;
+        incentiveLevels = _incentiveLevels;
+        depositFee = _depositFee;
+        withdrawalFee = _withdrawalFee;
+        minAmount = _minAmount;
+        feeDistribution = _feeDistribution;
+    }
 
     function getDeposit(address _user, uint256 _depositId) public view returns (Deposit memory) {
         require(_depositId != 0x0);
@@ -62,6 +77,8 @@ contract Pool is IPool {
 
         return total;
     }
+
+    
 
     // @dev Unstake tokens from the pool
     function unstake(address _user, uint256 _amount) public { 
