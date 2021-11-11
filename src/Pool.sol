@@ -47,6 +47,10 @@ contract Pool is IPool {
         feeDistribution = _feeDistribution;
     }
 
+    function getPoolToken() public view returns (address) {
+        return poolToken;
+    }
+
     function getDeposit(address _user, uint256 _depositId) public view returns (Deposit memory) {
         require(_depositId != 0x0);
         User memory user = users[_user];
@@ -56,7 +60,7 @@ contract Pool is IPool {
     function getDeposits(address _user) public view returns (uint256[] memory, uint256[] memory) {
         User memory user = users[_user];
 
-        /// user[userAddress].deposits -> convert to tuple to return, cant return structs
+        /// @dev user[userAddress].deposits -> convert to tuple to return, cant return structs
         uint256[] memory tokenAmounts = new uint256[](user.deposits.length);
         uint256[] memory timestamps = new uint256[](user.deposits.length);
         for (uint i = 0; i < user.deposits.length; i++) {

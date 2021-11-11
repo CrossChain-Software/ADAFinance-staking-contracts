@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../interfaces/IPool.sol";
+import "./interfaces/IPool.sol";
 import "./Pool.sol";
-import "../utils/Ownable.sol";
+import "./utils/Ownable.sol";
 
 contract PoolFactory is Ownable, IPool {
     address internal owner;
-    uint256 baseMod = 100;
-    address avaxTokenAddress = FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z;
+    address internal avaxTokenAddress = "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z";
 
     struct PoolData {
         address poolToken;
@@ -22,6 +21,8 @@ contract PoolFactory is Ownable, IPool {
         uint256 feeDistribution;
         uint256 totalStaked;
     }
+    // this has to change, we need the tokenAddress => PoolData
+    // or should it be poolAddress => PoolData?
     mapping (address => PoolData) internal poolAddressToData;
     mapping (address => address) public pools;
 
@@ -35,7 +36,7 @@ contract PoolFactory is Ownable, IPool {
         owner = msg.sender;
     }
 
-    function getPoolAddress (bytes32 _poolToken) public view returns (address) {
+    function getPoolAddress (address _poolToken) public view returns (address) {
         return pools[_poolToken];
     }
 
@@ -44,21 +45,22 @@ contract PoolFactory is Ownable, IPool {
     }
 
     // need to test- never returned a data type like this before
-    function getStakingPoolInfo(bytes32 _poolName, address _poolToken) public view returns (address) {
-        require(poolToken != address(0), "Pool not found!");
-
+    function getStakingPoolInfo(address _poolToken) public view returns (address) {
+        require(_poolToken != address(0), "Pool not found!");
+        
+        address pool = pools[_poolToken];
         
         return PoolData({
-            poolToken: _poolToken,
-            poolAddress: poolAddress,
-            incentivesSupply: poolAddress.getIncentivesSupply(),
-            incentivesRemaining: poolAddress.getIncentivesRemaining(),
-            incentiveLevels: poolAddress.getIncentiveLevels(),
-            depositFee: poolAddress.getDepositFee(),
-            withdrawalFee: poolAddress.getWithdrawalFee(),
-            minAmount: poolAddress.getMinAmount(),
-            feeDistribution: poolAddress.getFeeDistribution(),
-            totalStaked: poolAddress.getTotalStaked()
+            poolToken: pool._poolToken,
+            poolAddress: pool.poolAddress,
+            incentivesSupply: pool.incentivesSupply,
+            incentivesRemaining: pool.incentivesRemaining,
+            incentiveLevels: pool.incentiveLevels,
+            depositFee: pool.depositFee,
+            withdrawalFee: pool.withdrawalFee,
+            minAmount: pool.minAmount,
+            feeDistribution: pool.feeDistribution,
+            totalStaked: pool.totalStaked
         });
     }
 
@@ -66,6 +68,8 @@ contract PoolFactory is Ownable, IPool {
 
         IPool pool = new Pool(_poolToken, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
         
-        
+        // how do we create a new contract address and add it to the PoolData state + mapping?
+
+        return pool; // i think this returns the contract address?
     }
 }
