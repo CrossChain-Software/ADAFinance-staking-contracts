@@ -78,7 +78,7 @@ contract PoolFactory is Ownable {
 
     function createStakingPool(address _poolToken, uint256 _incentiveSupply, uint256 _level1Rewards, uint256 _level2Rewards, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256 _daoDistribution, uint256 _affiliateDistribution) onlyOwner external virtual {
 
-        IPool pool = new Pool(_poolToken, _incentiveSupply, _level1Rewards, _level2Rewards, _depositFee, _withdrawalFee, _minAmount, daoDistribution, affiliateDistribution);
+        IPool pool = new Pool(_poolToken, _incentiveSupply, _level1Rewards, _level2Rewards, _depositFee, _withdrawalFee, _minAmount, _daoDistribution, _affiliateDistribution);
         
         // registerPool(address(pool));
 
