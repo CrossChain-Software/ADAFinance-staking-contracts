@@ -6,9 +6,9 @@ import "./Pool.sol";
 import "../utils/Ownable.sol";
 
 contract PoolFactory is Ownable, IPool {
-    address owner;
+    address internal owner;
     uint256 baseMod = 100;
-    address avaxToken = FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z;
+    address avaxTokenAddress = FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z;
 
     struct PoolData {
         address poolToken;
@@ -32,7 +32,7 @@ contract PoolFactory is Ownable, IPool {
     );
 
     constructor() {
-        owner = msg.sender; // is this exploitable?
+        owner = msg.sender;
     }
 
     function getPoolAddress (bytes32 _poolToken) public view returns (address) {
@@ -43,9 +43,9 @@ contract PoolFactory is Ownable, IPool {
         return poolAddressToData[_poolAddress].totalStaked;
     }
 
+    // need to test- never returned a data type like this before
     function getStakingPoolInfo(bytes32 _poolName, address _poolToken) public view returns (address) {
-        address poolAddress = pools[_pooToken];
-        require(poolAddress != address(0), "pool not found!");
+        require(poolToken != address(0), "Pool not found!");
 
         
         return PoolData({
@@ -64,16 +64,8 @@ contract PoolFactory is Ownable, IPool {
 
     function createStakingPool(uint256 _incentiveSupply, bytes32[] memory _incentiveLevels, uint256 _depositFee, uint256 _withdrawalFee, uint256 _minAmount, uint256[] memory _feeDistribution, bytes32 _poolName, address _poolToken) onlyOwner external virtual returns (bool) {
 
-        IPool pool = new Pool(_poolName, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
+        IPool pool = new Pool(_poolToken, _incentiveSupply, _incentiveLevels, _depositFee, _withdrawalFee, _minAmount, _feeDistribution);
         
-
-        poolNameToAddresses[_poolName] = {
-            poolToken: _poolToken,
-            incentivesSupply: _incentiveSupply,
-            incentivesRemaining: _incentiveSupply,
-            incentiveLevels: _incentiveLevels,
-            depositFee: _depositFee,
-            withdrawalFee: _withdrawalFee,
-        };
+        
     }
 }
