@@ -5,9 +5,9 @@ import "./interfaces/IPool.sol";
 import "./Pool.sol";
 import "./utils/Ownable.sol";
 
-contract PoolFactory is Ownable, IPool {
+contract PoolFactory is Ownable {
     address internal owner;
-    address internal avaxTokenAddress = "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z";
+    address internal avaxTokenAddress = 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7;
 
     struct PoolData {
         address poolToken;
@@ -23,8 +23,9 @@ contract PoolFactory is Ownable, IPool {
     }
     // this has to change, we need the tokenAddress => PoolData
     // or should it be poolAddress => PoolData?
-    mapping (address => PoolData) internal poolAddressToData;
-    mapping (address => address) public pools;
+    mapping (address => PoolData) internal pools;
+    // tokenAddress => poolAdddress => PoolData
+    mapping (address => mapping(address => PoolData)) pools2;
 
     event PoolRegistered(
         address indexed _by,
@@ -41,26 +42,25 @@ contract PoolFactory is Ownable, IPool {
     }
 
     function getTotalStaked(address _poolAddress) public view returns (uint256) {
-        return poolAddressToData[_poolAddress].totalStaked;
+        return pools[_poolAddress].totalStaked;
     }
 
     // need to test- never returned a data type like this before
-    function getStakingPoolInfo(address _poolToken) public view returns (address) {
-        require(_poolToken != address(0), "Pool not found!");
-        
-        address pool = pools[_poolToken];
-        
+    function getStakingPoolInfo(address _poolAddress) public view returns (address) {
+        require(_poolAddress != address(0), "Pool not found!");];
+
+
         return PoolData({
-            poolToken: pool._poolToken,
-            poolAddress: pool.poolAddress,
-            incentivesSupply: pool.incentivesSupply,
-            incentivesRemaining: pool.incentivesRemaining,
-            incentiveLevels: pool.incentiveLevels,
-            depositFee: pool.depositFee,
-            withdrawalFee: pool.withdrawalFee,
-            minAmount: pool.minAmount,
-            feeDistribution: pool.feeDistribution,
-            totalStaked: pool.totalStaked
+            poolToken: pools[_poolAddress].poolToken,
+            poolAddress: pools[_poolAddress].poolAddress,
+            incentivesSupply: pools[_poolAddress].incentivesSupply,
+            incentivesRemaining: pools[_poolAddress].incentivesRemaining,
+            incentiveLevels: pools[_poolAddress].incentiveLevels,
+            depositFee: pools[_poolAddress].depositFee,
+            withdrawalFee: pools[_poolAddress].withdrawalFee,
+            minAmount: pools[_poolAddress].minAmount,
+            feeDistribution: pools[_poolAddress].feeDistribution,
+            totalStaked: pools[_poolAddress].totalStaked
         });
     }
 
