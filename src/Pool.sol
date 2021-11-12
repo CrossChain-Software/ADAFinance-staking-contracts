@@ -13,9 +13,10 @@ contract Pool is IPool, Ownable {
         /// @dev deposits = [{tokenAmount, timestamp}, {...}, ...]
         Deposit[] deposits;  
     }
-   
+
     mapping(address => User) public users;
     address poolToken;
+    uint256 poolTokenReserve;
     uint256 incentiveSupply;
     uint256 level1Rewards;
     uint256 level2Rewards;
@@ -75,14 +76,6 @@ contract Pool is IPool, Ownable {
         return total;
     }
 
-    
-    // @dev Unstake tokens from the pool
-    function unstake(address _user, uint256 _amount) public { 
-        require(users[_user].tokenAmount >= _amount);
-        users[_user].tokenAmount -= _amount;
-        // need to transfer funds to user
-    }
-
 
     function updateFeeDistributions(uint256 _daoDistribution, uint256 _affiliateDistribution) public onlyOwner {
         require(daoDistribution + affiliateDistribution <= 100);
@@ -106,14 +99,20 @@ contract Pool is IPool, Ownable {
 
     function stake(address _user, uint256 _amount) public {
         require(_amount >= minAmount, "Staking amount must be greater than or equal to minAmount");
+        require(users[_user].tokenAmount + _amount <= incentiveSupply);
+        
+        User storage user = users[_user];
+        Deposit memory newDeposit = Deposit({tokenAmount: _amount, timestamp: block.timestamp});
+        user.tokenAmount += _amount;
+        user.deposits.push(newDeposit);
+        
+        poolTokenReserve += _amount;
+    }
 
-        // create new user if not exists
-        if (!users._user) {
-            users[_user] = User({
-                tokenAmount: 0,
-                deposits: []
-            });
-        }
-
+    // @dev Unstake tokens from the pool
+    function unstake(address _user, uint256 _amount) public { 
+        require(users[_user].tokenAmount >= _amount);
+        users[_user].tokenAmount -= _amount;
+        // need to transfer funds to user
     }
 }
