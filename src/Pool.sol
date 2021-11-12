@@ -45,16 +45,19 @@ contract Pool is IPool, Ownable {
         return poolToken;
     }
 
+    /// @dev Gets a single deposit
+    /// @notice User storage design should be updated to search by depositId or user address- so you don't need both
     function getDeposit(address _user, uint256 _depositId) public view override returns (Deposit memory) {
         require(_depositId != 0x0);
         User memory user = users[_user];
         return user.deposits[_depositId];
     }
 
+    /// @dev Gets the deposits and returns a tuple
+    /// @return Solidity has limited types that you cant use for returns, so we use a tuple to return the tokenAmount and timestamp
     function getDeposits(address _user) public view override returns (uint256[] memory, uint256[] memory) {
         User memory user = users[_user];
 
-        /// @dev user[userAddress].deposits -> convert to tuple to return, cant return structs
         uint256[] memory tokenAmounts = new uint256[](user.deposits.length);
         uint256[] memory timestamps = new uint256[](user.deposits.length);
         for (uint i = 0; i < user.deposits.length; i++) {
@@ -65,6 +68,8 @@ contract Pool is IPool, Ownable {
         return (tokenAmounts, timestamps);
     }
 
+    /// @dev Gets the total amount staked per user, uses a for loop to sum up all the deposits
+    /// @notice Needs logic to take into account rewards
     function getTotalStakedPerUser(address _user) public view override returns (uint256) {
         User memory user = users[_user];
         uint256 total = 0;
@@ -76,19 +81,14 @@ contract Pool is IPool, Ownable {
         return total;
     }
 
-
+    /// @dev Allows owner to update the fees
     function updateFeeDistributions(uint256 _daoDistribution, uint256 _affiliateDistribution) public onlyOwner {
         require(daoDistribution + affiliateDistribution <= 100);
         daoDistribution = _daoDistribution;
         affiliateDistribution = _affiliateDistribution;
     }
-
-    function updateFeeAddresses(address _daoAddress, address _affiliateAddress) public onlyOwner {
-        require(daoDistribution + affiliateDistribution <= 100);
-        daoAddress = _daoAddress;
-        affiliateAddress = _affiliateAddress;
-    }
     
+    /// @dev Allows owner to update the fee addresses
     function updateFeeDistrbutionAddresses(address _daoAddress, address _affiliateAddress) public onlyOwner {
         require(msg.sender == owner());
         require(_daoAddress != address(0x0));
@@ -97,6 +97,8 @@ contract Pool is IPool, Ownable {
         affiliateAddress = _affiliateAddress;
     }
 
+    /// @dev Stame the tokens for a new user
+    /// @notice Needs logic to handle if the user has previously deposited
     function stake(address _user, uint256 _amount) public {
         require(_amount >= minAmount, "Staking amount must be greater than or equal to minAmount");
         require(users[_user].tokenAmount + _amount <= incentiveSupply);
@@ -109,10 +111,36 @@ contract Pool is IPool, Ownable {
         poolTokenReserve += _amount;
     }
 
-    // @dev Unstake tokens from the pool
-    function unstake(address _user, uint256 _amount) public { 
-        require(users[_user].tokenAmount >= _amount);
+    /// @dev Unstake tokens from the pool
+    function unstake(address _user, uint256 _amount, uint256 _depositId) public { 
+        require(_amount > 0, "Zero amount");
+        
+        User storage user = users[_user];
+        Deposit storage stakeDeposit = user.deposits[_depositId];
+        
+        require(stakeDeposit.tokenAmount >= _amount, "Not enough tokens to unstake");
+
+        processRewards(_user, stakeDeposit.tokenAmount, stakeDeposit.timestamp);
+
         users[_user].tokenAmount -= _amount;
-        // need to transfer funds to user
+    }
+
+    /// @dev Calculates the total rewards a person has earned, >/< 90 days
+    function processRewards(address _user, uint256 _amount, uint256 _timestamp) internal {
+        require(_amount > 0, "Zero amount");
+        require(_timestamp > 0, "Invalid timestamp");
+        require(_timestamp <= block.timestamp, "Timestamp must be in the past");
+        require(users[_user].tokenAmount >= _amount, "Not enough tokens to process rewards");
+        
+        // if unstaking before 90 days, they only get tokenAmount + 15% APR
+        // we can calc this when they withdraw to save on gas AND would make the function easier
+        if () {
+
+        }
+        _processRewards(_user, _amount, _timestamp);
+    }
+
+    function calculateAPR(uint256 _tokenAmount) returns (uint256) {
+        
     }
 }
