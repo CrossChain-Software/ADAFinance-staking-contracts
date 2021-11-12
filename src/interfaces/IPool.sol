@@ -17,6 +17,10 @@ interface IPool {
 
     function getTotalStakedPerUser(address _user) external view returns (uint256);
     
+    function stake(address _user, uint256 _amount) external;
+
+    function unstake(address _user, uint256 _amount, uint256 _depositId) external;
+
     // function getIncentivesSupply() external view returns (uint256);
     
     // function getIncentivesRemaining() external view returns (uint256);
@@ -32,10 +36,6 @@ interface IPool {
     // function getFeeDistribution() external view returns (uint256);
     
     // function getTotalStaked() external view returns (uint256);
-
-    // function stake(uint256 _amount) external;
-
-    // function unstake(uint256 _amount) external;
 
     // function calcRewards(uint256 _amount) external;
 
