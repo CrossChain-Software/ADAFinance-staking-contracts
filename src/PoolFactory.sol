@@ -80,8 +80,26 @@ contract PoolFactory is Ownable {
 
         IPool pool = new Pool(_poolToken, _incentiveSupply, _level1Rewards, _level2Rewards, _depositFee, _withdrawalFee, _minAmount, _daoDistribution, _affiliateDistribution);
         
-        // registerPool(address(pool));
+        // registerPool(address(pool)); // we need to pass in the struct
+        pools[address(pool)] = pool;
 
         emit PoolRegistered(msg.sender, _poolToken, address(pool));
+    }
+
+    function registerPool(address _pool) public onlyOwner {
+        require(_pool != address(0), "Pool not found!");
+
+        // pools[_pool].poolToken = poolToken;
+        // pools[_pool].poolAddress = _pool;
+        // pools[_pool].incentivesSupply = 0;
+        // pools[_pool].incentivesRemaining = 0;
+        // pools[_pool].level1Rewards = 0;
+        // pools[_pool].level2Rewards = 0;
+        // pools[_pool].depositFee = 0;
+        // pools[_pool].withdrawalFee = 0;
+        // pools[_pool].minAmount = 0;
+        // pools[_pool].daoDistribution = 0;
+        // pools[_pool].affiliateDistribution = 0;
+        // pools[_pool].totalStaked = 0;
     }
 }

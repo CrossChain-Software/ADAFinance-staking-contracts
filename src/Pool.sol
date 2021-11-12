@@ -84,9 +84,16 @@ contract Pool is IPool, Ownable {
     }
 
 
-    function updateFeeDistributions(uint256 daoDistribution, address daoAddress, uint256 affiliateDistribution, address affiliateAddress) public onlyOwner {
+    function updateFeeDistributions(uint256 _daoDistribution, uint256 _affiliateDistribution) public onlyOwner {
         require(daoDistribution + affiliateDistribution <= 100);
+        daoDistribution = _daoDistribution;
+        affiliateDistribution = _affiliateDistribution;
+    }
 
+    function updateFeeAddresses(address _daoAddress, address _affiliateAddress) public onlyOwner {
+        require(daoDistribution + affiliateDistribution <= 100);
+        daoAddress = _daoAddress;
+        affiliateAddress = _affiliateAddress;
     }
     
     function updateFeeDistrbutionAddresses(address _daoAddress, address _affiliateAddress) public onlyOwner {
@@ -95,5 +102,18 @@ contract Pool is IPool, Ownable {
         require(_affiliateAddress != address(0x0));
         daoAddress = _daoAddress;
         affiliateAddress = _affiliateAddress;
+    }
+
+    function stake(address _user, uint256 _amount) public {
+        require(_amount >= minAmount, "Staking amount must be greater than or equal to minAmount");
+
+        // create new user if not exists
+        if (!users._user) {
+            users[_user] = User({
+                tokenAmount: 0,
+                deposits: []
+            });
+        }
+
     }
 }
