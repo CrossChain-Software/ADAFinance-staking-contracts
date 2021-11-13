@@ -49,6 +49,7 @@ contract Pool is IPool, Ownable {
     /// @notice User storage design should be updated to search by depositId or user address- so you don't need both
     function getDeposit(address _user, uint256 _depositId) public view override returns (Deposit memory) {
         require(_depositId != 0x0);
+
         User memory user = users[_user];
         return user.deposits[_depositId];
     }
@@ -57,9 +58,9 @@ contract Pool is IPool, Ownable {
     /// @return Solidity has limited types that you cant use for returns, so we use a tuple to return the tokenAmount and timestamp
     function getDeposits(address _user) public view override returns (uint256[] memory, uint256[] memory) {
         User memory user = users[_user];
-
         uint256[] memory tokenAmounts = new uint256[](user.deposits.length);
         uint256[] memory timestamps = new uint256[](user.deposits.length);
+
         for (uint i = 0; i < user.deposits.length; i++) {
             tokenAmounts[i] = user.deposits[i].tokenAmount;
             timestamps[i] = user.deposits[i].timestamp;
@@ -84,6 +85,7 @@ contract Pool is IPool, Ownable {
     /// @dev Allows owner to update the fees
     function updateFeeDistributions(uint256 _daoDistribution, uint256 _affiliateDistribution) public onlyOwner {
         require(daoDistribution + affiliateDistribution <= 100);
+
         daoDistribution = _daoDistribution;
         affiliateDistribution = _affiliateDistribution;
     }
@@ -93,6 +95,7 @@ contract Pool is IPool, Ownable {
         require(msg.sender == owner());
         require(_daoAddress != address(0x0));
         require(_affiliateAddress != address(0x0));
+
         daoAddress = _daoAddress;
         affiliateAddress = _affiliateAddress;
     }
@@ -107,7 +110,6 @@ contract Pool is IPool, Ownable {
         Deposit memory newDeposit = Deposit({tokenAmount: _amount, timestamp: block.timestamp});
         user.tokenAmount += _amount;
         user.deposits.push(newDeposit);
-        
         poolTokenReserve += _amount;
     }
 
@@ -126,21 +128,24 @@ contract Pool is IPool, Ownable {
     }
 
     /// @dev Calculates the total rewards a person has earned, >/< 90 days
-    function processRewards(address _user, uint256 _amount, uint256 _timestamp) internal {
-        require(_amount > 0, "Zero amount");
+    function processRewards(address _user, uint256 _tokenAmount, uint256 _timestamp) internal {
+        require(_tokenAmount > 0, "Zero amount");
         require(_timestamp > 0, "Invalid timestamp");
         require(_timestamp <= block.timestamp, "Timestamp must be in the past");
-        require(users[_user].tokenAmount >= _amount, "Not enough tokens to process rewards");
+        require(users[_user].tokenAmount >= _tokenAmount, "Not enough tokens to process rewards");
         
         // if unstaking before 90 days, they only get tokenAmount + 15% APR
-        // we can calc this when they withdraw to save on gas AND would make the function easier
-        if () {
-
+        // calc this when they withdraw to save on gas
+        if ((block.timestamp - _timestamp) > 90) {
+            // 20% APR
+            calculateAPR(_tokenAmount, 20);
+        } else {
+            // 15% APR
+            calculateAPR(_tokenAmount, 15);
         }
-        _processRewards(_user, _amount, _timestamp);
     }
 
-    function calculateAPR(uint256 _tokenAmount) returns (uint256) {
-        
+    function calculateAPR(uint256 _tokenAmount, uint256 _percentage) internal virtual returns (uint256) {
+
     }
 }
